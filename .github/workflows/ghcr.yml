@@ -1,0 +1,74 @@
+name: 'Build and Push to GHCR'
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+env:
+  DEFAULT_MUSIC_FOLDER: /tmp/music
+  EXCLUDED_TEST_GROUPS:
+  IMAGE: ghcr.io/${{ github.repository_owner }}/airsonic-advanced
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: temurin
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-m2-
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - run: mkdir -p ${DEFAULT_MUSIC_FOLDER}
+
+      - name: Build with Maven
+        run: mvn -DexcludedGroups=${EXCLUDED_TEST_GROUPS} -Ddocker.testing.default-music-folder=${DEFAULT_MUSIC_FOLDER} verify -B -P integration-test
+
+      - name: Calculate tags
+        id: meta
+        run: |
+          ver=$(grep "version=" airsonic-main/target/generated/build-metadata/build.properties | cut -d"=" -f2)
+          ts=$(grep "timestamp=" airsonic-main/target/generated/build-metadata/build.properties | cut -d"=" -f2)
+          tag=$ver.$ts
+          echo "tag=$tag" >> $GITHUB_OUTPUT
+          echo "image_tag=${IMAGE}:${tag}" >> $GITHUB_OUTPUT
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push to GHCR
+        uses: docker/build-push-action@v5
+        with:
+          file: install/docker/Dockerfile
+          context: install/docker
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/latest
+            ghcr.io/${{ github.repository }}:${{ steps.meta.outputs.tag }}
+            ghcr.io/${{ github.repository }}:gitcommit-${{ github.sha }}
