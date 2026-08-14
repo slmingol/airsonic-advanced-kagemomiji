@@ -69,6 +69,6 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/latest
-            ghcr.io/${{ github.repository }}:${{ steps.meta.outputs.tag }}
-            ghcr.io/${{ github.repository }}:gitcommit-${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/airsonic-advanced:latest
+            ghcr.io/${{ github.repository_owner }}/airsonic-advanced:${{ steps.meta.outputs.tag }}
+            ghcr.io/${{ github.repository_owner }}/airsonic-advanced:gitcommit-${{ github.sha }}
