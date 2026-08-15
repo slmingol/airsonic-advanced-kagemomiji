@@ -3,7 +3,7 @@ WORKDIR target
 
 COPY target/dependency/airsonic-main.war airsonic.war
 
-FROM ghcr.io/linuxserver/baseimage-ubuntu:jammy
+FROM ghcr.io/linuxserver/baseimage-alpine:3.21
 
 LABEL description="Airsonic-Advanced is a free, web-based media streamer, providing ubiquitous access to your music." \
       url="https://github.com/slmingol/airsonic-advanced"
@@ -12,17 +12,16 @@ ENV AIRSONIC_ADVANCED_HOME="/app/airsonic" \
     AIRSONIC_ADVANCED_SETTINGS="/config" \
     LANG="C.UTF-8"
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
+RUN apk add --no-cache \
+        curl \
         ffmpeg \
         flac \
-        fonts-dejavu \
+        fontconfig \
         lame \
-        netcat-openbsd \
-        openjdk-17-jre-headless \
-    && mkdir -p /app/airsonic \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+        openjdk17-jre \
+        ttf-dejavu \
+        vorbis-tools \
+    && mkdir -p /app/airsonic
 
 COPY --from=builder target/airsonic.war /app/airsonic/airsonic.war
 COPY root/ /
