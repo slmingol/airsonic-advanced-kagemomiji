@@ -8,15 +8,10 @@ on:
 env:
   DEFAULT_MUSIC_FOLDER: /tmp/music
   EXCLUDED_TEST_GROUPS:
-  IMAGE: ghcr.io/${{ github.repository_owner }}/airsonic-advanced
 
 jobs:
-  build-and-push:
+  build-war:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-
     steps:
       - uses: actions/checkout@v4
 
@@ -34,32 +29,49 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-m2-
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
       - run: mkdir -p ${DEFAULT_MUSIC_FOLDER}
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build with Maven
         run: mvn install -DskipTests -B -P docker
+
+      - name: Upload WAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: airsonic-war
+          path: install/docker/target/dependency/airsonic-main.war
+          retention-days: 1
 
       - name: Calculate tags
         id: meta
         run: |
           ver=$(grep "version=" airsonic-main/target/generated/build-metadata/build.properties | cut -d"=" -f2)
           ts=$(grep "timestamp=" airsonic-main/target/generated/build-metadata/build.properties | cut -d"=" -f2)
-          tag=$ver.$ts
-          echo "tag=$tag" >> $GITHUB_OUTPUT
-          echo "image_tag=${IMAGE}:${tag}" >> $GITHUB_OUTPUT
+          echo "tag=$ver.$ts" >> $GITHUB_OUTPUT
+
+    outputs:
+      tag: ${{ steps.meta.outputs.tag }}
+
+  build-and-push:
+    runs-on: ubuntu-latest
+    needs: build-war
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download WAR
+        uses: actions/download-artifact@v4
+        with:
+          name: airsonic-war
+          path: install/docker/target/dependency/
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -75,7 +87,9 @@ jobs:
           context: install/docker
           platforms: linux/amd64,linux/arm64
           push: true
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/airsonic-advanced:buildcache
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/airsonic-advanced:buildcache,mode=max
           tags: |
             ghcr.io/${{ github.repository_owner }}/airsonic-advanced:latest
-            ghcr.io/${{ github.repository_owner }}/airsonic-advanced:${{ steps.meta.outputs.tag }}
+            ghcr.io/${{ github.repository_owner }}/airsonic-advanced:${{ needs.build-war.outputs.tag }}
             ghcr.io/${{ github.repository_owner }}/airsonic-advanced:gitcommit-${{ github.sha }}
