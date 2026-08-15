@@ -30,3 +30,5 @@ COPY root/ /
 EXPOSE 4040
 
 VOLUME /config /music /playlists /podcasts
+
+HEALTHCHECK --interval=15s --timeout=3s CMD curl -sf http://localhost:4040/rest/ping || false
