@@ -50,7 +50,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build with Maven
-        run: mvn install -DskipTests -B
+        run: mvn install -DskipTests -B -P docker
 
       - name: Calculate tags
         id: meta
