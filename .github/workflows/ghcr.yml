@@ -35,7 +35,7 @@ jobs:
         run: mvn install -DskipTests -B -P docker
 
       - name: Upload WAR
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: airsonic-war
           path: install/docker/target/dependency/airsonic-main.war
