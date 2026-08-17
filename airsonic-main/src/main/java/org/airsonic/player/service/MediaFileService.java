@@ -439,7 +439,7 @@ public class MediaFileService {
             .and((root, q, cb) -> root.get("folder").in(musicFolders))
             .and((root, q, cb) -> root.get("mediaType").in(MediaType.audioTypes()))
             .and((root, q, cb) -> cb.isTrue(root.get("present")));
-        return mediaFileRepository.findAll(spec, new OffsetBasedPageRequest(offset, count, Sort.by("id"))).getContent();
+        return mediaFileRepository.findAll(spec, new OffsetBasedPageRequest(offset, count, Sort.by("id")));
     }
 
     private <T> Specification<T> buildGenreSpec(String genre, String separators) {
