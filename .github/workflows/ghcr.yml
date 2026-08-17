@@ -12,7 +12,7 @@ permissions:
 env:
   DEFAULT_MUSIC_FOLDER: /tmp/music
   EXCLUDED_TEST_GROUPS:
-  REGISTRY_IMAGE: ghcr.io/${{ github.repository_owner }}/airsonic-advanced
+  REGISTRY_IMAGE: ghcr.io/${{ github.repository_owner }}/airsonic-advanced-kagemomiji
 
 jobs:
   build-war:
