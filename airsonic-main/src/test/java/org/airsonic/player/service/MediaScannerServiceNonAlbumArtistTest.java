@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -51,7 +52,7 @@ public class MediaScannerServiceNonAlbumArtistTest {
         file.setArtist("SoloArtist");
         file.setMediaType(MediaFile.MediaType.MUSIC);
 
-        MusicFolder folder = new MusicFolder("/music", "Music", true, null, false);
+        MusicFolder folder = new MusicFolder(Paths.get("/music"), "Music", MusicFolder.Type.MEDIA, true, null);
         Instant now = Instant.now();
 
         when(artistService.getArtist("SoloArtist")).thenReturn(null);
@@ -74,7 +75,7 @@ public class MediaScannerServiceNonAlbumArtistTest {
         file.setArtist("FeaturedArtist");
         file.setMediaType(MediaFile.MediaType.MUSIC);
 
-        MusicFolder folder = new MusicFolder("/music", "Music", true, null, false);
+        MusicFolder folder = new MusicFolder(Paths.get("/music"), "Music", MusicFolder.Type.MEDIA, true, null);
         Instant now = Instant.now();
 
         when(artistService.getArtist("AlbumBand")).thenReturn(null);
