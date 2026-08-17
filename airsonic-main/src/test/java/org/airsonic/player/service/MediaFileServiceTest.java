@@ -31,6 +31,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -157,5 +158,28 @@ public class MediaFileServiceTest {
     public void testGetSongsByGenreEmptyFoldersReturnsEmpty() {
         List<MediaFile> result = mediaFileService.getSongsByGenre(0, 10, "Dance", Collections.emptyList());
         assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testGetSongsForAlbumFiltersIndexedSourceFile() {
+        MediaFile sourceFile = new MediaFile();
+        sourceFile.setIndexPath("album/disc.cue");
+        sourceFile.setPath("album/disc.flac");
+        sourceFile.setMediaType(MediaType.MUSIC);
+
+        MediaFile virtualTrack = new MediaFile();
+        virtualTrack.setPath("album/disc.flac");
+        virtualTrack.setStartPosition(0.0);
+        virtualTrack.setMediaType(MediaType.MUSIC);
+
+        when(mediaFileRepository.findByAlbumArtistAndAlbumNameAndMediaTypeInAndPresentTrue(
+                eq("Artist"), eq("Album"), any(), any(Sort.class)))
+                .thenReturn(List.of(sourceFile, virtualTrack));
+        when(settingsService.getHideVirtualTracks()).thenReturn(false);
+
+        List<MediaFile> result = mediaFileService.getSongsForAlbum("Artist", "Album");
+
+        assertEquals(1, result.size());
+        assertTrue(result.get(0).isIndexedTrack(), "Only virtual tracks should be returned");
     }
 }
