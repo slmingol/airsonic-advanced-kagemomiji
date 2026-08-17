@@ -513,7 +513,8 @@ public class MediaScannerService {
      */
     private void updateArtist(MediaFile grandParent, MediaFile file, MusicFolder musicFolder, Instant lastScanned,
             Map<String, AtomicInteger> albumCount, Map<String, Artist> artists) {
-        if (file.getAlbumArtist() == null || !file.isAudio()) {
+        String artistName = file.getAlbumArtist() != null ? file.getAlbumArtist() : file.getArtist();
+        if (artistName == null || !file.isAudio()) {
             return;
         }
 
