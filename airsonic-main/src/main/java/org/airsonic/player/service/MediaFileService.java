@@ -447,6 +447,8 @@ public class MediaFileService {
                 preds.add(cb.like(root.get("genre"), genre + s + "%"));
                 preds.add(cb.like(root.get("genre"), "%" + s + genre + s + "%"));
                 preds.add(cb.like(root.get("genre"), "%" + s + genre));
+                preds.add(cb.like(root.get("genre"), "%" + s + " " + genre + s + "%"));
+                preds.add(cb.like(root.get("genre"), "%" + s + " " + genre));
             }
             return cb.or(preds.toArray(new Predicate[0]));
         };
