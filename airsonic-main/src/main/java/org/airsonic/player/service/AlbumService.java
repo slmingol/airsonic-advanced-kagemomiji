@@ -221,10 +221,10 @@ public class AlbumService {
         }
         OffsetBasedPageRequest pageRequest = new OffsetBasedPageRequest(offset, count, Sort.by(Order.asc("id")));
         String separators = settingsService.getGenreSeparators();
-        Specification<Album> spec = buildGenreSpec(genre, separators)
+        Specification<Album> spec = this.<Album>buildGenreSpec(genre, separators)
             .and((root, q, cb) -> root.get("folder").in(musicFolders))
             .and((root, q, cb) -> cb.isTrue(root.get("present")));
-        return albumRepository.findAll(spec, pageRequest);
+        return albumRepository.findAll(spec, pageRequest).getContent();
     }
 
     private <T> Specification<T> buildGenreSpec(String genre, String separators) {
