@@ -20,11 +20,11 @@
  */
 package org.airsonic.player.service;
 
-import org.apache.commons.lang.StringUtils;
 import org.airsonic.player.config.AirsonicScanConfig;
 import org.airsonic.player.domain.*;
 import org.airsonic.player.domain.CoverArt.EntityType;
 import org.airsonic.player.service.search.IndexManager;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.simp.SimpMessagingTemplate;

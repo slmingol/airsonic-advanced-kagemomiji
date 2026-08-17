@@ -28,12 +28,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.groups.Default;
 
-import java.security.Principal;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;

@@ -7,7 +7,6 @@ import org.airsonic.player.domain.entity.StarredAlbum;
 import org.airsonic.player.repository.AlbumRepository;
 import org.airsonic.player.repository.OffsetBasedPageRequest;
 import org.airsonic.player.repository.StarredAlbumRepository;
-import org.airsonic.player.service.SettingsService;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.jpa.domain.Specification;
