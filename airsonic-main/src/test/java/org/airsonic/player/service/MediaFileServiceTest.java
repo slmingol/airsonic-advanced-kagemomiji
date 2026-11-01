@@ -25,7 +25,6 @@ import org.airsonic.player.repository.MediaFileRepository;
 import org.airsonic.player.repository.MusicFileInfoRepository;
 import org.airsonic.player.service.cache.MediaFileCache;
 import org.airsonic.player.service.metadata.MetaDataParserFactory;
-import org.airsonic.player.util.FileUtil;
 import org.digitalmediaserver.cuelib.CueSheet;
 import org.digitalmediaserver.cuelib.FileData;
 import org.digitalmediaserver.cuelib.Index;
